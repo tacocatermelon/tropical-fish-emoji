@@ -36,19 +36,21 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
             g.drawString("TOUCHING",50,70);
         }
         //g.drawString(getMousePosition().getX()+", "+getMousePosition().getY(),10,50);
-        if (pressedKeys[65]) {
+
+        //player moves left
+        if (pressedKeys[65]||pressedKeys[37]) { //37 -- Left, 65 -- A
             player.faceLeft();
             player.moveLeft();
         }
 
-        // player moves right (D)
-        if (pressedKeys[68]) {
+        // player moves right
+        if (pressedKeys[68]||pressedKeys[39]) { // 39 -- Right, 68 -- D
             player.faceRight();
             player.moveRight();
         }
 
-        // player moves up (W)
-        if (pressedKeys[87]) {
+        // player moves up
+        if (pressedKeys[87]||pressedKeys[38]||pressedKeys[32]) { // 38 -- Up, 87 -- W, 32 -- Space
             player.moveUp();
         }
     }
@@ -58,6 +60,8 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         if(System.currentTimeMillis()-pressLength[87]>=50&&pressLength[87]!=0){
             pressLength[87] = 0;
             pressedKeys[87] = false;
+            pressedKeys[38] = false;
+            pressedKeys[32] = false;
             jumpCooldown = true;
         }
         player.updatePos();
@@ -95,10 +99,13 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         if(key==10){
             timer.start();
         }
-        if(key==87&&(jumpCooldown)||player.isFalling()||player.isJumping()){
+        if((key==87||key==38||key==32)&&(jumpCooldown)||player.isFalling()||player.isJumping()){
             return;
         }
         pressedKeys[key] = true;
+        if(key == 38||key==32){
+            pressLength[87] = System.currentTimeMillis();
+        }
         pressLength[key] = System.currentTimeMillis(); //stores start time
     }
 
@@ -107,7 +114,11 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         int key = e.getKeyCode();
         pressedKeys[key] = false;
         pressLength[key] = 0;
-        if(key == 87) {
+        if(key == 87||key == 38||key==32) {
+            pressedKeys[87] = false;
+            pressedKeys[38] = false;
+            pressedKeys[32] = false;
+            pressLength[87] = 0;
             jumpCooldown = false;
         }
     }
