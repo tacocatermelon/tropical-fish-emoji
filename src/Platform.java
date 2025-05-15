@@ -1,36 +1,12 @@
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+public class Platform extends Floor{
 
-public class Platform {
-
-    private int xPos;
-    private int yPos;
     private int width;
     private int height;
-    private final BufferedImage platform;
 
     public Platform(int xPos, int yPos, int width, int height) {
-        this.xPos = xPos;
-        this.yPos = yPos;
+        super(xPos, yPos);
         this.width = width;
         this.height = height;
-        try {
-            platform = ImageIO.read(new File("src/Floor Test.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public int getxPos() {
-        return xPos;
-    }
-
-    public int getyPos() {
-        return yPos;
     }
 
     public int getWidth() {
@@ -41,14 +17,11 @@ public class Platform {
         return height;
     }
 
-    public BufferedImage getPlatformImage() {
-        return platform;
+    public void setWidth(int width) {
+        this.width = width;
     }
 
-    public Rectangle platformRect() {
-        int imageHeight = getPlatformImage().getHeight();
-        int imageWidth = getPlatformImage().getWidth();
-        Rectangle rect = new Rectangle((int) xPos, (int) yPos, imageWidth, imageHeight);
-        return rect;
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

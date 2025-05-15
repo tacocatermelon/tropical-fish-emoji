@@ -8,12 +8,12 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     private Timer timer;
     private boolean[] pressedKeys;
     private double[] pressLength;
-    private Platform floor;
+    private Floor floor;
     private boolean jumpCooldown;
 
     public GraphicsPanel(){
         player = new Player();
-        floor = new Platform(0,500,960,40);
+        floor = new Floor(0,500);
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
         jumpCooldown = false;
