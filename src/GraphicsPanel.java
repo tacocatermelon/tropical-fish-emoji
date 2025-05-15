@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class GraphicsPanel extends JPanel implements ActionListener, KeyListener, MouseListener {
 
@@ -10,24 +14,28 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     private double[] pressLength;
     private Floor floor;
     private boolean jumpCooldown;
+    private boolean[] levels;
+    private BufferedImage background;
 
-    public GraphicsPanel(){
+    public GraphicsPanel() throws IOException {
+        background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
         player = new Player();
-        floor = new Floor(0,500);
+        floor = new Floor(0,512, null);
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
+        levels = new boolean[5];
         jumpCooldown = false;
         addKeyListener(this);
         addMouseListener(this);
-        setFocusable(true); // this line of code + one below makes this panel active for keylistener events
-        requestFocusInWindow(); // see comment above
+        setFocusable(true);
+        requestFocusInWindow();
         timer = new Timer(5, this);
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setFont(Font.getFont("Spectral"));
+        g.drawImage(background,0,0,null);
         g.drawImage(floor.getPlatformImage(),floor.getxPos(),floor.getyPos(),null);
         g.drawImage(player.getPlayerImage(), player.getxPos(), player.getyPos(), null);
         g.drawString("Position: "+player.getxPos()+ ", " +player.getyPos(),10,20);
@@ -35,6 +43,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         if(player.isTouching(floor.platformRect())){
             g.drawString("TOUCHING",50,70);
         }
+
         //g.drawString(getMousePosition().getX()+", "+getMousePosition().getY(),10,50);
 
         //player moves left
@@ -81,7 +90,9 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         if(player.isTouching(floor.platformRect())){
             player.setFalling(false);
             player.setJumping(false);
+            player.setStanding(player.getxVel()<0.1&&player.getxVel()>-0.1);
         }else{
+            player.setStanding(false);
             player.setJumping(player.getyVel() >= 0);
             player.setFalling(player.getyVel() < 0);
         }

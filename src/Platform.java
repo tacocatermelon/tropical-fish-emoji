@@ -1,10 +1,12 @@
+import java.awt.image.BufferedImage;
+
 public class Platform extends Floor{
 
     private int width;
     private int height;
 
-    public Platform(int xPos, int yPos, int width, int height) {
-        super(xPos, yPos);
+    public Platform(int xPos, int yPos, BufferedImage img, int width, int height) {
+        super(xPos, yPos, img);
         this.width = width;
         this.height = height;
     }

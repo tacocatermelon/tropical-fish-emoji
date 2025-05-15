@@ -10,13 +10,17 @@ public class Floor {
     private int yPos;
     private final BufferedImage platform;
 
-    public Floor(int xPos, int yPos) {
+    public Floor(int xPos, int yPos, BufferedImage img) {
         this.xPos = xPos;
         this.yPos = yPos;
-        try {
-            platform = ImageIO.read(new File("src/Floor Test.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(img == null) {
+            try {
+                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }else{
+            platform = img;
         }
     }
 
@@ -43,7 +47,6 @@ public class Floor {
     public Rectangle platformRect() {
         int imageHeight = getPlatformImage().getHeight();
         int imageWidth = getPlatformImage().getWidth();
-        Rectangle rect = new Rectangle((int) xPos, (int) yPos, imageWidth, imageHeight);
-        return rect;
+        return new Rectangle(xPos, yPos, imageWidth, imageHeight);
     }
 }

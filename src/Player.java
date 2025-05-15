@@ -14,7 +14,8 @@ public class Player {
     private boolean facingRight;
     private boolean jumping;
     private boolean falling;
-    private BufferedImage[][] sprites = new BufferedImage[2][3];
+    private boolean standing;
+    private BufferedImage[][] sprites = new BufferedImage[2][4];
 
     public Player(){
         xPos = 0;
@@ -24,13 +25,16 @@ public class Player {
         facingRight = true;
         jumping = false;
         falling = false;
+        standing = false;
         try {
             sprites[0][0] = ImageIO.read(new File("src/PlayerSprites/Standing Test.png"));
             sprites[0][1] = ImageIO.read(new File("src/PlayerSprites/Falling Test.png"));
             sprites[0][2] = ImageIO.read(new File("src/PlayerSprites/Jumping Test.png"));
+            sprites[0][3] = ImageIO.read(new File("src/PlayerSprites/Player Sit Right.png"));
             sprites[1][0] = ImageIO.read(new File("src/PlayerSprites/Standing Test.png"));
             sprites[1][1] = ImageIO.read(new File("src/PlayerSprites/Falling Test.png"));
             sprites[1][2] = ImageIO.read(new File("src/PlayerSprites/Jumping Test.png"));
+            sprites[1][3] = ImageIO.read(new File("src/PlayerSprites/Player Sit Left.png"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -55,6 +59,10 @@ public class Player {
 
     public boolean isFacingRight() {
         return facingRight;
+    }
+
+    public boolean isStanding() {
+        return standing;
     }
 
     public boolean isJumping() {
@@ -95,6 +103,10 @@ public class Player {
     
     public void setJumping(boolean isJumping){
         jumping = isJumping;
+    }
+
+    public void setStanding(boolean standing) {
+        this.standing = standing;
     }
 
     public void moveRight() {
@@ -152,6 +164,8 @@ public class Player {
             b = 1;
         } else if (jumping) {
             b = 2;
+        }else if(standing){
+            b = 3;
         }
         return sprites[a][b];
     }
@@ -159,8 +173,7 @@ public class Player {
     public Rectangle playerRect() {
         int imageHeight = getPlayerImage().getHeight();
         int imageWidth = getPlayerImage().getWidth();
-        Rectangle rect = new Rectangle((int) xPos, (int) yPos, imageWidth, imageHeight);
-        return rect;
+        return new Rectangle(xPos, yPos, imageWidth, imageHeight);
     }
 
     public boolean isTouching(Rectangle b){
