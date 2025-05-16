@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GraphicsPanel extends JPanel implements ActionListener, KeyListener, MouseListener {
 
@@ -20,7 +21,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     public GraphicsPanel() throws IOException {
         background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
         player = new Player();
-        floor = new Floor(0,512, null);
+        floor = new Floor(0, 512, null);
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
         levels = new boolean[5];
@@ -35,38 +36,38 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(background,0,0,null);
-        g.drawImage(floor.getPlatformImage(),floor.getxPos(),floor.getyPos(),null);
-        g.drawImage(player.getPlayerImage(), player.getxPos(), player.getyPos(), null);
-        g.drawString("Position: "+player.getxPos()+ ", " +player.getyPos(),10,20);
-        g.drawString("Velocity: "+player.getxVel()+ ", " +player.getyVel(),10,35);
-        if(player.isTouching(floor.platformRect())){
-            g.drawString("TOUCHING",50,70);
+        g.drawImage(background, 0, 0, null);
+        g.drawImage(floor.getPlatformImage(), floor.getxPos(), floor.getyPos(), null);
+        g.drawImage(player.getAnimation().getSprite(), player.getxPos(), player.getyPos(), null);
+        g.drawString("Position: " + player.getxPos() + ", " + player.getyPos(), 10, 20);
+        g.drawString("Velocity: " + player.getxVel() + ", " + player.getyVel(), 10, 35);
+        if (player.isTouching(floor.platformRect())) {
+            g.drawString("TOUCHING", 50, 70);
         }
 
         //g.drawString(getMousePosition().getX()+", "+getMousePosition().getY(),10,50);
 
         //player moves left
-        if (pressedKeys[65]||pressedKeys[37]) { //37 -- Left, 65 -- A
+        if (pressedKeys[65] || pressedKeys[37]) { //37 -- Left, 65 -- A
             player.faceLeft();
             player.moveLeft();
         }
 
         // player moves right
-        if (pressedKeys[68]||pressedKeys[39]) { // 39 -- Right, 68 -- D
+        if (pressedKeys[68] || pressedKeys[39]) { // 39 -- Right, 68 -- D
             player.faceRight();
             player.moveRight();
         }
 
         // player moves up
-        if (pressedKeys[87]||pressedKeys[38]||pressedKeys[32]) { // 38 -- Up, 87 -- W, 32 -- Space
+        if (pressedKeys[87] || pressedKeys[38] || pressedKeys[32]) { // 38 -- Up, 87 -- W, 32 -- Space
             player.moveUp();
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(System.currentTimeMillis()-pressLength[87]>=50&&pressLength[87]!=0){
+        if (System.currentTimeMillis() - pressLength[87] >= 50 && pressLength[87] != 0) {
             pressLength[87] = 0;
             pressedKeys[87] = false;
             pressedKeys[38] = false;
@@ -76,26 +77,32 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         player.updatePos();
         player.updateFriction();
         player.updateGravity();
-        if((player.playerRect().intersects(floor.platformRect()))||(player.getyPos()>floor.getyPos())){
+        if ((player.playerRect().intersects(floor.platformRect())) || (player.getyPos() > floor.getyPos())) {
             player.setyVel(0);
-            player.setyPos(floor.getyPos()-player.getPlayerImage().getHeight());
+            player.setyPos(floor.getyPos() - player.getAnimation().getSprite().getHeight());
         }
-        if(player.getxPos()+player.getxVel()>960-player.getPlayerImage().getWidth()){
+        if (player.getxPos() + player.getxVel() > 960 - player.getAnimation().getSprite().getWidth()) {
             player.setxVel(0);
-            player.setxPos(960-player.getPlayerImage().getWidth());
-        }else if(player.getxPos()+player.getxVel()<0){
+            player.setxPos(960 - player.getAnimation().getSprite().getWidth());
+        } else if (player.getxPos() + player.getxVel() < 0) {
             player.setxVel(0);
             player.setxPos(0);
         }
-        if(player.isTouching(floor.platformRect())){
+        if (player.isTouching(floor.platformRect())) {
             player.setFalling(false);
             player.setJumping(false);
-            player.setStanding(player.getxVel()<0.1&&player.getxVel()>-0.1);
-        }else{
+            player.setStanding(player.getxVel() < 0.1 && player.getxVel() > -0.1);
+        } else {
             player.setStanding(false);
             player.setJumping(player.getyVel() >= 0);
             player.setFalling(player.getyVel() < 0);
         }
+        if(!player.setAnimation().equals(player.getAnimation())){
+            player.getAnimation().stop();
+            player.getAnimation().reset();
+        }
+        player.getAnimation().start();
+        player.getAnimation().update();
         repaint();
     }
 
@@ -107,14 +114,14 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if(key==10){
+        if (key == 10) {
             timer.start();
         }
-        if((key==87||key==38||key==32)&&(jumpCooldown)||player.isFalling()||player.isJumping()){
+        if ((key == 87 || key == 38 || key == 32) && (jumpCooldown) || player.isFalling() || player.isJumping()) {
             return;
         }
         pressedKeys[key] = true;
-        if(key == 38||key==32){
+        if (key == 38 || key == 32) {
             pressLength[87] = System.currentTimeMillis();
         }
         pressLength[key] = System.currentTimeMillis(); //stores start time
@@ -125,7 +132,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         int key = e.getKeyCode();
         pressedKeys[key] = false;
         pressLength[key] = 0;
-        if(key == 87||key == 38||key==32) {
+        if (key == 87 || key == 38 || key == 32) {
             pressedKeys[87] = false;
             pressedKeys[38] = false;
             pressedKeys[32] = false;
@@ -158,4 +165,5 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     public void mouseExited(MouseEvent e) {
 
     }
+
 }

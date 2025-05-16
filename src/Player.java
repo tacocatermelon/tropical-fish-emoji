@@ -6,7 +6,6 @@ import java.io.IOException;
 
 public class Player {
 
-    private final int MOVE_AMT = 3;
     private int xPos;
     private int yPos;
     private double xVel;
@@ -15,7 +14,17 @@ public class Player {
     private boolean jumping;
     private boolean falling;
     private boolean standing;
-    private BufferedImage[][] sprites = new BufferedImage[2][4];
+    private Animation[] animations = new Animation[4];
+    private BufferedImage walkingSheet;
+    private BufferedImage standingSheet;
+    private BufferedImage jumpingSheet;
+    private BufferedImage fallingSheet;
+    private BufferedImage[] walkingRight;
+    private Animation walk;
+    private Animation stand;
+    private Animation jump;
+    private Animation fall;
+    private Animation animation;
 
     public Player(){
         xPos = 0;
@@ -27,18 +36,27 @@ public class Player {
         falling = false;
         standing = false;
         try {
-            sprites[0][0] = ImageIO.read(new File("src/PlayerSprites/Standing Test.png"));
-            sprites[0][1] = ImageIO.read(new File("src/PlayerSprites/Falling Test.png"));
-            sprites[0][2] = ImageIO.read(new File("src/PlayerSprites/Jumping Test.png"));
-            sprites[0][3] = ImageIO.read(new File("src/PlayerSprites/Player Sit Right.png"));
-            sprites[1][0] = ImageIO.read(new File("src/PlayerSprites/Standing Test.png"));
-            sprites[1][1] = ImageIO.read(new File("src/PlayerSprites/Falling Test.png"));
-            sprites[1][2] = ImageIO.read(new File("src/PlayerSprites/Jumping Test.png"));
-            sprites[1][3] = ImageIO.read(new File("src/PlayerSprites/Player Sit Left.png"));
+            walkingSheet = ImageIO.read(new File("src/PlayerSprites/Walking SpriteSheet.png"));
+            standingSheet = ImageIO.read(new File("src/PlayerSprites/Player Sit Right.png"));
+            jumpingSheet = ImageIO.read(new File("src/PlayerSprites/Jumping Test.png"));
+            fallingSheet = ImageIO.read(new File("src/PlayerSprites/Falling Test.png"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        
+        walkingRight = new BufferedImage[]{Sprite.getSprite(0, 0, walkingSheet), Sprite.getSprite(1, 0, walkingSheet), Sprite.getSprite(0, 1, walkingSheet), Sprite.getSprite(1, 1, walkingSheet)};
+        walk = new Animation(walkingRight,10);
+        stand = new Animation(new BufferedImage[]{standingSheet},10);
+        jump = new Animation(new BufferedImage[]{jumpingSheet},10);
+        fall = new Animation(new BufferedImage[]{fallingSheet},10);
+        animations[0] = stand;
+        animations[1] = walk;
+        animations[2] = jump;
+        animations[3] = fall;
+        animation = stand;
+    }
+
+    public Animation getAnimation(){
+        return animation;
     }
 
     public int getxPos() {
@@ -154,25 +172,22 @@ public class Player {
         }
     }
     
-    public BufferedImage getPlayerImage(){
-        int a = 0;
-        int b = 0;
-        if(!facingRight) {
-            a = 1;
-        }
-        if(falling){
-            b = 1;
+    public Animation setAnimation(){
+        int a = 1;
+        if(standing){
+            a = 0;
         } else if (jumping) {
-            b = 2;
-        }else if(standing){
-            b = 3;
+            a = 2;
+        }else if(falling) {
+            a = 3;
         }
-        return sprites[a][b];
+        animation = animations[a];
+        return animations[a];
     }
 
     public Rectangle playerRect() {
-        int imageHeight = getPlayerImage().getHeight();
-        int imageWidth = getPlayerImage().getWidth();
+        int imageHeight = getAnimation().getSprite().getHeight();
+        int imageWidth = getAnimation().getSprite().getWidth();
         return new Rectangle(xPos, yPos, imageWidth, imageHeight);
     }
 
@@ -180,5 +195,4 @@ public class Player {
         Rectangle a = playerRect();
         return (a.getY()+a.getHeight()==b.getY()||a.getY()==b.getY()+b.getHeight())&&((a.getX()>=b.getX())||(a.getX()+a.getWidth()<=b.getX()+b.getWidth()));
     }
-
 }
