@@ -15,13 +15,17 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     private double[] pressLength;
     private Floor floor;
     private boolean jumpCooldown;
+    private ArrayList<Platform> platforms;
     private boolean[] levels;
     private BufferedImage background;
 
     public GraphicsPanel() throws IOException {
         background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
+        platforms = new ArrayList<>();
         player = new Player();
-        floor = new Floor(0, 512, null);
+        floor = new Floor(0, 0, null);
+        floor.setyPos(Frame.getHeight()-floor.getPlatformImage().getHeight());
+        platforms.add(new Platform(200, floor.getyPos()-40, ImageIO.read(new File("src/Backgrounds/Floor1.png")), 100, 40));
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
         levels = new boolean[5];
@@ -36,13 +40,25 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(background, 0, 0, null);
-        g.drawImage(floor.getPlatformImage(), floor.getxPos(), floor.getyPos(), null);
-        g.drawImage(player.getAnimation().getSprite(), player.getxPos(), player.getyPos(), null);
+        g.drawImage(background, 0, 0,Frame.getWidth(),Frame.getHeight(), null);
+        floor.drawPlatform(g,Frame.getWidth());
+        for(Platform a:platforms){
+            a.drawPlatform(g,a.getWidth(),a.getHeight());
+        }
+        if(player.isFacingRight()) {
+            g.drawImage(player.getAnimation().getSprite(), player.getxPos(), player.getyPos(), null);
+        }else{
+            g.drawImage(player.getAnimation().getSprite(),player.getxPos()+player.getAnimation().getSprite().getWidth(),player.getyPos(),player.getAnimation().getSprite().getWidth()*-1,player.getAnimation().getSprite().getHeight(),null);
+        }
         g.drawString("Position: " + player.getxPos() + ", " + player.getyPos(), 10, 20);
         g.drawString("Velocity: " + player.getxVel() + ", " + player.getyVel(), 10, 35);
         if (player.isTouching(floor.platformRect())) {
             g.drawString("TOUCHING", 50, 70);
+        }
+        for(Platform a:platforms){
+            if (player.isTouching(a.platformRect())) {
+                g.drawString("TOUCHING", 50, 110);
+            }
         }
 
         //g.drawString(getMousePosition().getX()+", "+getMousePosition().getY(),10,50);
@@ -81,14 +97,21 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
             player.setyVel(0);
             player.setyPos(floor.getyPos() - player.getAnimation().getSprite().getHeight());
         }
-        if (player.getxPos() + player.getxVel() > 960 - player.getAnimation().getSprite().getWidth()) {
+
+        player.checkCollision(platforms.get(0));
+
+        for(Platform a:platforms){
+
+        }
+
+        if (player.getxPos() + player.getxVel() > Frame.getWidth() - player.getAnimation().getSprite().getWidth()) {
             player.setxVel(0);
-            player.setxPos(960 - player.getAnimation().getSprite().getWidth());
+            player.setxPos(Frame.getWidth() - player.getAnimation().getSprite().getWidth());
         } else if (player.getxPos() + player.getxVel() < 0) {
             player.setxVel(0);
             player.setxPos(0);
         }
-        if (player.isTouching(floor.platformRect())) {
+        if (player.isTouching(floor.platformRect())||player.isTouching(platforms)) {
             player.setFalling(false);
             player.setJumping(false);
             player.setStanding(player.getxVel() < 0.1 && player.getxVel() > -0.1);

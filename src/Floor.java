@@ -49,4 +49,12 @@ public class Floor {
         int imageWidth = getPlatformImage().getWidth();
         return new Rectangle(xPos, yPos, imageWidth, imageHeight);
     }
+
+    public void drawPlatform(Graphics g, int width){
+        g.drawImage(platform, xPos, yPos, width, getPlatformImage().getHeight(),null);
+    }
+
+    public void drawPlatform(Graphics g, int width, int height){
+        g.drawImage(platform, xPos, yPos, width, height, null);
+    }
 }
