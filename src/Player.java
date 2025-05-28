@@ -47,10 +47,10 @@ public class Player {
             System.out.println(e.getMessage());
         }
         walkingRight = new BufferedImage[]{Sprite.getSprite(0, 0, walkingSheet), Sprite.getSprite(1, 0, walkingSheet), Sprite.getSprite(0, 1, walkingSheet), Sprite.getSprite(1, 1, walkingSheet)};
-        walk = new Animation(walkingRight, 10);
-        stand = new Animation(new BufferedImage[]{standingSheet}, 10);
-        jump = new Animation(new BufferedImage[]{jumpingSheet}, 10);
-        fall = new Animation(new BufferedImage[]{fallingSheet}, 10);
+        walk = new Animation(walkingRight, 50);
+        stand = new Animation(new BufferedImage[]{standingSheet}, 50);
+        jump = new Animation(new BufferedImage[]{jumpingSheet}, 50);
+        fall = new Animation(new BufferedImage[]{fallingSheet}, 50);
         animations[0] = stand;
         animations[1] = walk;
         animations[2] = jump;
@@ -131,27 +131,30 @@ public class Player {
     }
 
     public void moveRight() {
-        xVel += 0.175;
+        xVel += 0.035;
     }
 
     public void moveLeft() {
-        xVel -= 0.175;
+        xVel -= 0.035;
     }
 
     public void moveUp() {
-        yVel += 0.75;
+        yVel += 0.15;
     }
 
     public void updateGravity() {
         if(!standing) {
-            yVel -= 0.1;
+            yVel -= 0.02;
         }
     }
 
-    public void updatePos() {
+    public void updateXPos() {
         prevX = xPos;
-        prevY = yPos;
         xPos += (int) xVel;
+    }
+
+    public void updateYPos(){
+        prevY = yPos;
         yPos -= (int) yVel;
     }
 
@@ -161,7 +164,7 @@ public class Player {
                 xVel = 0;
             } else {
                 if (xVel > 5) {
-                    xVel -= 0.15;
+                    xVel -= 0.03;
                 } else {
                     xVel -= 0.1;
                 }
@@ -171,7 +174,7 @@ public class Player {
                 xVel = 0;
             } else {
                 if (xVel < -5) {
-                    xVel += 0.15;
+                    xVel += 0.03;
                 } else {
                     xVel += 0.1;
                 }
@@ -213,20 +216,7 @@ public class Player {
         return out;
     }
 
-    public void checkCollision(Platform p){
-        if(isNextTo(p)) {
-            if (prevX < xPos) {//moving right
-                if (xPos + animation.getSprite().getWidth() > p.getxPos() && xPos + animation.getSprite().getWidth() < p.getxPos()+p.getWidth()) {
-                    xVel = 0;
-                    xPos = p.getxPos() - animation.getSprite().getWidth();
-                }
-            } else if (prevX > xPos) {//moving left
-                if (xPos < p.getxPos() + p.getWidth() && xPos > p.getxPos()) {
-                    xVel = 0;
-                    xPos = p.getxPos() + p.getWidth();
-                }
-            }
-        }
+    public void vertcollis(Platform p){
         if(isAbove(p)) {
             if (prevY < yPos) {//moving down
                 if (yPos + animation.getSprite().getHeight() > p.getyPos() && yPos + animation.getSprite().getHeight() < p.getyPos()+p.getHeight()) {
@@ -242,26 +232,50 @@ public class Player {
         }
     }
 
+    public void horizCollis(Platform p){
+        if(isNextTo(p)) {
+            if (prevX < xPos) {//moving right
+                if (xPos + animation.getSprite().getWidth() > p.getxPos() && xPos + animation.getSprite().getWidth() < p.getxPos()+p.getWidth()) {
+                    xVel = 0;
+                    xPos = p.getxPos() - animation.getSprite().getWidth();
+                }
+            } else if (prevX > xPos) {//moving left
+                if (xPos < p.getxPos() + p.getWidth() && xPos > p.getxPos()) {
+                    xVel = 0;
+                    xPos = p.getxPos() + p.getWidth();
+                }
+            }
+        }
+    }
+
     public boolean isAbove(Platform p){
+        int leftSide = xPos;
+        int rightSide = xPos+animation.getSprite().getWidth();
+        int platformLeft = p.getxPos();
+        int platformRight = p.getxPos()+p.getWidth();
         boolean out = false;
-        if(xPos < p.getxPos() && xPos+animation.getSprite().getWidth() > p.getxPos()){ // left side is further left than platform left
-            out =  true;                                                               // right side is further right than platform left
-        }else if(xPos+animation.getSprite().getWidth() > p.getxPos()+p.getWidth() && xPos < p.getxPos()+p.getWidth()){ // right side is further than platform right
-            out =  true;                                                                                               // left side is further left than platform right
-        }else if(xPos > p.getxPos() && xPos+animation.getSprite().getWidth() < p.getxPos()+p.getWidth()){ // left side is further right than platform left
-            out = true;                                                                                   // right side is further left than platform right
+        if(leftSide < platformLeft && rightSide > platformLeft){ // left side is further left than platform left & right side is further right than platform left
+            out =  true;                                         // x--|---x   |
+        }else if(rightSide > platformRight && leftSide < platformRight){ // right side is further right than platform right & left side is further left than platform right
+            out =  true;                                                 // |   x---|--x
+        }else if(leftSide > platformLeft && rightSide < platformRight){ // left side is further right than platform left & right side is further left than platform right
+            out = true;                                                 // | x-----x|
         }
         return out;
     }
 
     public boolean isNextTo(Platform p){
+        int topSide = yPos;
+        int bottomSide = yPos+animation.getSprite().getHeight();
+        int platformTop = p.getyPos();
+        int platformBottom = p.getyPos()+p.getHeight();
         boolean out = false;
-        if(yPos < p.getyPos() && yPos+animation.getSprite().getHeight() < p.getyPos()+p.getHeight() && yPos+animation.getSprite().getHeight() > p.getyPos()){ // top edge higher than platform top
-            out = true;                                                                                                                                       // bottom edge higher than platform bottom and lower than platform top
-        }else if(yPos+animation.getSprite().getHeight() > p.getyPos()+p.getHeight() && yPos > p.getyPos() && yPos < p.getyPos()+p.getHeight()){ //bottom edge lower than platform bottom
-            out = true;                                                                                                                         // top edge lower than platform top and higher than platform bottom
-        }else if(yPos > p.getyPos() && yPos+animation.getSprite().getHeight() < p.getyPos()+p.getHeight()){ // top edge lower than top edge
-            out = true;                                                                                     // bottom edge higher than bottom edge
+        if(topSide <= platformTop && bottomSide >= platformTop){ // top edge higher than platform top & bottom edge lower than platform top
+            out = true;                                        // x---|--x   |
+        }else if(bottomSide >= platformBottom && topSide <= platformBottom){ //bottom edge lower than platform bottom & top edge higher than platform bottom
+            out = true;                                                    // |   x--|---x
+        }else if(topSide >= platformTop && bottomSide <= platformBottom){ // top edge lower than top edge & bottom edge higher than bottom edge
+            out = true;                                                 // | x-----x|
         }
         return out;
     }

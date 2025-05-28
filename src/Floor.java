@@ -8,9 +8,11 @@ public class Floor {
 
     private int xPos;
     private int yPos;
+    private int width;
     private final BufferedImage platform;
 
-    public Floor(int xPos, int yPos, BufferedImage img) {
+    public Floor(int xPos, int yPos, BufferedImage img, int width) {
+        this.width = width;
         this.xPos = xPos;
         this.yPos = yPos;
         if(img == null) {
@@ -24,12 +26,20 @@ public class Floor {
         }
     }
 
+    public int getWidth() {
+        return width;
+    }
+
     public int getxPos() {
         return xPos;
     }
 
     public int getyPos() {
         return yPos;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public void setxPos(int xPos) {
@@ -46,11 +56,10 @@ public class Floor {
 
     public Rectangle platformRect() {
         int imageHeight = getPlatformImage().getHeight();
-        int imageWidth = getPlatformImage().getWidth();
-        return new Rectangle(xPos, yPos, imageWidth, imageHeight);
+        return new Rectangle(xPos, yPos, width, imageHeight);
     }
 
-    public void drawPlatform(Graphics g, int width){
+    public void drawPlatform(Graphics g){
         g.drawImage(platform, xPos, yPos, width, getPlatformImage().getHeight(),null);
     }
 

@@ -23,9 +23,9 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
         platforms = new ArrayList<>();
         player = new Player();
-        floor = new Floor(0, 0, null);
+        floor = new Floor(0, 0, null, Frame.getWidth());
         floor.setyPos(Frame.getHeight()-floor.getPlatformImage().getHeight());
-        platforms.add(new Platform(200, floor.getyPos()-40, ImageIO.read(new File("src/Backgrounds/Floor1.png")), 100, 40));
+        platforms.add(new Platform(200, floor.getyPos()-120, ImageIO.read(new File("src/Backgrounds/Floor1.png")), 100, 40));
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
         levels = new boolean[5];
@@ -34,14 +34,14 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
         addMouseListener(this);
         setFocusable(true);
         requestFocusInWindow();
-        timer = new Timer(5, this);
+        timer = new Timer(1, this);
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(background, 0, 0,Frame.getWidth(),Frame.getHeight(), null);
-        floor.drawPlatform(g,Frame.getWidth());
+        floor.drawPlatform(g);
         for(Platform a:platforms){
             a.drawPlatform(g,a.getWidth(),a.getHeight());
         }
@@ -90,15 +90,16 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
             pressedKeys[32] = false;
             jumpCooldown = true;
         }
-        player.updatePos();
+        player.updateXPos();
         player.updateFriction();
+        player.horizCollis(platforms.get(0));
+        player.updateYPos();
         player.updateGravity();
+        player.vertcollis(platforms.get(0));
         if ((player.playerRect().intersects(floor.platformRect())) || (player.getyPos() > floor.getyPos())) {
             player.setyVel(0);
             player.setyPos(floor.getyPos() - player.getAnimation().getSprite().getHeight());
         }
-
-        player.checkCollision(platforms.get(0));
 
         for(Platform a:platforms){
 
