@@ -212,6 +212,9 @@ public class Player {
         for(Platform pl: platforms){
             Rectangle b = pl.platformRect();
             out = (a.getY() + a.getHeight() == b.getY() || a.getY() == b.getY() + b.getHeight()) && ((a.getX() >= b.getX()) || (a.getX() + a.getWidth() <= b.getX() + b.getWidth()));
+            if(out){
+                return out;
+            }
         }
         return out;
     }
