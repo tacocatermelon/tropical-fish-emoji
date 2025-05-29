@@ -144,7 +144,7 @@ public class Player {
 
     public void updateGravity() {
         if(!standing) {
-            yVel -= 0.02;
+            yVel -= 0.015;
         }
     }
 
@@ -160,23 +160,23 @@ public class Player {
 
     public void updateFriction() {
         if (xVel > 0) {
-            if (xVel - 0.1 < 0) {
+            if (xVel - 0.01 < 0) {
                 xVel = 0;
             } else {
                 if (xVel > 5) {
-                    xVel -= 0.03;
+                    xVel -= 0.04;
                 } else {
-                    xVel -= 0.1;
+                    xVel -= 0.025;
                 }
             }
         } else if (xVel < 0) {
-            if (xVel + 0.1 > 0) {
+            if (xVel + 0.01 > 0) {
                 xVel = 0;
             } else {
                 if (xVel < -5) {
-                    xVel += 0.03;
+                    xVel += 0.04;
                 } else {
-                    xVel += 0.1;
+                    xVel += 0.025;
                 }
             }
         }
@@ -258,7 +258,7 @@ public class Player {
             out =  true;                                         // x--|---x   |
         }else if(rightSide > platformRight && leftSide < platformRight){ // right side is further right than platform right & left side is further left than platform right
             out =  true;                                                 // |   x---|--x
-        }else if(leftSide > platformLeft && rightSide < platformRight){ // left side is further right than platform left & right side is further left than platform right
+        }else if(leftSide >= platformLeft && rightSide <= platformRight){ // left side is further right than platform left & right side is further left than platform right
             out = true;                                                 // | x-----x|
         }
         return out;
@@ -270,9 +270,9 @@ public class Player {
         int platformTop = p.getyPos();
         int platformBottom = p.getyPos()+p.getHeight();
         boolean out = false;
-        if(topSide <= platformTop && bottomSide >= platformTop){ // top edge higher than platform top & bottom edge lower than platform top
+        if(topSide < platformTop && bottomSide > platformTop){ // top edge higher than platform top & bottom edge lower than platform top
             out = true;                                        // x---|--x   |
-        }else if(bottomSide >= platformBottom && topSide <= platformBottom){ //bottom edge lower than platform bottom & top edge higher than platform bottom
+        }else if(bottomSide > platformBottom && topSide < platformBottom){ //bottom edge lower than platform bottom & top edge higher than platform bottom
             out = true;                                                    // |   x--|---x
         }else if(topSide >= platformTop && bottomSide <= platformBottom){ // top edge lower than top edge & bottom edge higher than bottom edge
             out = true;                                                 // | x-----x|
