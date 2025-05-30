@@ -28,6 +28,7 @@ public class Player {
     private Animation jump;
     private Animation fall;
     private Animation animation;
+    private GraphicsPanel graphicsPanel;
 
     public Player() {
         xPos = 0;
@@ -38,6 +39,7 @@ public class Player {
         jumping = false;
         falling = false;
         standing = false;
+
         try {
             walkingSheet = ImageIO.read(new File("src/PlayerSprites/Walking SpriteSheet.png"));
             standingSheet = ImageIO.read(new File("src/PlayerSprites/Player Sit Right.png"));
@@ -46,11 +48,14 @@ public class Player {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+
         walkingRight = new BufferedImage[]{Sprite.getSprite(0, 0, walkingSheet), Sprite.getSprite(1, 0, walkingSheet), Sprite.getSprite(0, 1, walkingSheet), Sprite.getSprite(1, 1, walkingSheet)};
-        walk = new Animation(walkingRight, 50);
+
+        walk = new Animation(walkingRight, 25);
         stand = new Animation(new BufferedImage[]{standingSheet}, 50);
         jump = new Animation(new BufferedImage[]{jumpingSheet}, 50);
         fall = new Animation(new BufferedImage[]{fallingSheet}, 50);
+
         animations[0] = stand;
         animations[1] = walk;
         animations[2] = jump;
@@ -94,6 +99,10 @@ public class Player {
         return falling;
     }
 
+    public void setGraphicsPanel(GraphicsPanel graphicsPanel) {
+        this.graphicsPanel = graphicsPanel;
+    }
+
     public void setxPos(int xPos) {
         this.xPos = xPos;
     }
@@ -131,31 +140,33 @@ public class Player {
     }
 
     public void moveRight() {
-        xVel += 0.035;
+        xVel += 0.07;
     }
 
     public void moveLeft() {
-        xVel -= 0.035;
+        xVel -= 0.07;
     }
 
     public void moveUp() {
-        yVel += 0.15;
+        yVel += 0.3;
     }
 
     public void updateGravity() {
         if(!standing) {
-            yVel -= 0.015;
+            yVel -= 0.025;
         }
     }
 
     public void updateXPos() {
         prevX = xPos;
         xPos += (int) xVel;
+        graphicsPanel.repaint();
     }
 
     public void updateYPos(){
         prevY = yPos;
         yPos -= (int) yVel;
+        graphicsPanel.repaint();
     }
 
     public void updateFriction() {
@@ -164,9 +175,9 @@ public class Player {
                 xVel = 0;
             } else {
                 if (xVel > 5) {
-                    xVel -= 0.04;
+                    xVel -= 0.08;
                 } else {
-                    xVel -= 0.025;
+                    xVel -= 0.05;
                 }
             }
         } else if (xVel < 0) {
@@ -174,9 +185,9 @@ public class Player {
                 xVel = 0;
             } else {
                 if (xVel < -5) {
-                    xVel += 0.04;
+                    xVel += 0.08;
                 } else {
-                    xVel += 0.025;
+                    xVel += 0.05;
                 }
             }
         }
@@ -191,6 +202,7 @@ public class Player {
         } else if (falling) {
             a = 3;
         }
+
         animation = animations[a];
         return animations[a];
     }
@@ -209,6 +221,7 @@ public class Player {
     public boolean isTouching(ArrayList<Platform> platforms){
         boolean out = false;
         Rectangle a = playerRect();
+
         for(Platform pl: platforms){
             Rectangle b = pl.platformRect();
             out = (a.getY() + a.getHeight() == b.getY() || a.getY() == b.getY() + b.getHeight()) && ((a.getX() >= b.getX()) || (a.getX() + a.getWidth() <= b.getX() + b.getWidth()));
@@ -257,6 +270,7 @@ public class Player {
         int platformLeft = p.getxPos();
         int platformRight = p.getxPos()+p.getWidth();
         boolean out = false;
+
         if(leftSide < platformLeft && rightSide > platformLeft){ // left side is further left than platform left & right side is further right than platform left
             out =  true;                                         // x--|---x   |
         }else if(rightSide > platformRight && leftSide < platformRight){ // right side is further right than platform right & left side is further left than platform right
@@ -273,6 +287,7 @@ public class Player {
         int platformTop = p.getyPos();
         int platformBottom = p.getyPos()+p.getHeight();
         boolean out = false;
+
         if(topSide < platformTop && bottomSide > platformTop){ // top edge higher than platform top & bottom edge lower than platform top
             out = true;                                        // x---|--x   |
         }else if(bottomSide > platformBottom && topSide < platformBottom){ //bottom edge lower than platform bottom & top edge higher than platform bottom

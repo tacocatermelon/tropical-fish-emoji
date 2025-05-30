@@ -15,6 +15,7 @@ public class Floor {
         this.width = width;
         this.xPos = xPos;
         this.yPos = yPos;
+
         if(img == null) {
             try {
                 platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));

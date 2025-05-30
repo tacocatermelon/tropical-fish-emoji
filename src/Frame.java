@@ -6,7 +6,7 @@ public class Frame {
 
     private static JFrame frame;
 
-    public Frame() throws IOException {
+    public Frame(){
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frame = new JFrame("1, 2, spaghetti sauce, 17, train, 4");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

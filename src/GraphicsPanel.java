@@ -9,63 +9,95 @@ import java.util.ArrayList;
 
 public class GraphicsPanel extends JPanel implements ActionListener, KeyListener, MouseListener {
 
+    private int currentLevel;
+    private boolean jumpCooldown;
+    private boolean flyMode;
     private Player player;
     private Timer timer;
+    private Floor floor;
     private boolean[] pressedKeys;
     private double[] pressLength;
-    private Floor floor;
-    private boolean jumpCooldown;
-    private ArrayList<Platform> platforms;
     private Level[] levels;
-    private int currentLevel;
-    private boolean flyMode;
+    private ArrayList<Platform> platforms;
 
-    public GraphicsPanel() throws IOException {
+    public GraphicsPanel(){
         currentLevel = 1;
+        levels = new Level[]{new Level(1), new Level(2), new Level(3), new Level(4), new Level(5)};
+
         flyMode = false;
+        jumpCooldown = false;
+
         platforms = new ArrayList<>();
         player = new Player();
         floor = new Floor(0, 0, null, Frame.getWidth());
+
         pressedKeys = new boolean[128]; // 128 keys on keyboard, max keycode is 127
         pressLength = new double[128];
-        levels = new Level[]{new Level(1), new Level(2), new Level(3), new Level(4), new Level(5)};
-        jumpCooldown = false;
         addKeyListener(this);
         addMouseListener(this);
         setFocusable(true);
         requestFocusInWindow();
-        timer = new Timer(1, this);
+
+        player.setGraphicsPanel(this);
+
+        timer = new Timer(2, this);
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(currentLevel == 1) {
+
+        levels[currentLevel - 1].drawLevel(g);
+
+        if (currentLevel == 1) {
             floor.setxPos(0);
-            floor.setyPos(Frame.getHeight()-floor.getPlatformImage().getHeight());
+            floor.setyPos(Frame.getHeight() - floor.getPlatformImage().getHeight());
             floor.drawPlatform(g);
-        }else{
+        } else {
             floor.setxPos(-100000000);
             floor.setyPos(100000000);
         }
-        levels[currentLevel-1].drawLevel(g);
 
-        if(player.isFacingRight()) {
+        if (player.isFacingRight()) {
             g.drawImage(player.getAnimation().getSprite(), player.getxPos(), player.getyPos(), null);
-        }else{
-            g.drawImage(player.getAnimation().getSprite(),player.getxPos()+player.getAnimation().getSprite().getWidth(),player.getyPos(),player.getAnimation().getSprite().getWidth()*-1,player.getAnimation().getSprite().getHeight(),null);
+        } else {
+            g.drawImage(player.getAnimation().getSprite(), player.getxPos() + player.getAnimation().getSprite().getWidth(), player.getyPos(), player.getAnimation().getSprite().getWidth() * -1, player.getAnimation().getSprite().getHeight(), null);
         }
 
         g.drawString("Position: " + player.getxPos() + ", " + player.getyPos(), 10, 20);
         g.drawString("Velocity: " + player.getxVel() + ", " + player.getyVel(), 10, 35);
 
-        if(flyMode){
-            g.drawString("FLY MODE",10,50);
+        if (flyMode) {
+            g.drawString("FLY MODE", 10, 50);
         }
 
         //g.drawString(getMousePosition().getX()+", "+getMousePosition().getY(),10,50);
+    }
 
-        //player moves left
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(player.getyPos()-player.getAnimation().getSprite().getHeight()>Frame.getHeight() && currentLevel>1){
+            currentLevel--;
+            player.setyPos(0);
+        }else if(player.getyPos()<0 && currentLevel<5){
+            currentLevel++;
+            player.setxPos(levels[currentLevel-1].getStartPos()[0]);
+            player.setyPos(levels[currentLevel-1].getStartPos()[1]);
+        }
+
+        platforms = levels[currentLevel-1].getPlatforms();
+
+        if(!flyMode) {
+            if (System.currentTimeMillis() - pressLength[87] >= 50 && pressLength[87] != 0) {
+                pressLength[87] = 0;
+                pressedKeys[87] = false;
+                pressedKeys[38] = false;
+                pressedKeys[32] = false;
+                jumpCooldown = true;
+            }
+        }
+
+        // player moves down
         if (pressedKeys[65] || pressedKeys[37]) { //37 -- Left, 65 -- A
             if(!flyMode){
                 player.faceLeft();
@@ -94,33 +126,9 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
             }
         }
 
+        // player moves down
         if(pressedKeys[83] || pressedKeys[40] && flyMode){ //40 -- Down, 83 -- S
             player.setyPos(player.getyPos()+1);
-        }
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(player.getyPos()-player.getAnimation().getSprite().getHeight()>Frame.getHeight() && currentLevel>1){
-            currentLevel--;
-            player.setyPos(0);
-        }else if(player.getyPos()<0 && currentLevel<5){
-            currentLevel++;
-            player.setxPos(levels[currentLevel-1].getStartPos()[0]);
-            player.setyPos(levels[currentLevel-1].getStartPos()[1]);
-        }
-
-        platforms = levels[currentLevel-1].getPlatforms();
-
-        if(!flyMode) {
-            if (System.currentTimeMillis() - pressLength[87] >= 50 && pressLength[87] != 0) {
-                pressLength[87] = 0;
-                pressedKeys[87] = false;
-                pressedKeys[38] = false;
-                pressedKeys[32] = false;
-                jumpCooldown = true;
-            }
         }
 
         if(!flyMode) {
