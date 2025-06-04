@@ -18,7 +18,7 @@ public class Floor {
 
         if(img == null) {
             try {
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Level 1 Platform.png"));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -67,4 +67,5 @@ public class Floor {
     public void drawPlatform(Graphics g, int width, int height){
         g.drawImage(platform, xPos, yPos, width, height, null);
     }
+
 }

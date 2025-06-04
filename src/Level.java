@@ -18,15 +18,17 @@ public class Level {
 
         if(level == 1){
             startPos[0] = 225;
-            startPos[1] = height(200);
+            startPos[1] = height(100);
 
             try {
-                background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                background = ImageIO.read(new File("src/Backgrounds/Level 1 background.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Level 1 Platform.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
 
+            //System.out.println(Frame.getWidth());
+            //System.out.println(Frame.getHeight());
             platforms.add(new Platform(200, height(120), platform, 100, 40));
             platforms.add(new Platform(400, height(150), platform, 200, 30));
             platforms.add(new Platform(800, height(225), platform, 150, 35));
@@ -38,24 +40,25 @@ public class Level {
             platforms.add(new Platform(100, height(550), platform, 100, 35));
             platforms.add(new Platform(250, height(675), platform, 100, 20));
         }else if(level == 2){
-            startPos[0] = 0;
-            startPos[1] = height(25);
+            startPos[0] = 106;
+            startPos[1] = height(200);
 
             try {
                 background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Test Floor.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
 
             platforms.add(new Platform(100, height(150), platform, 200, 30));
+            platforms.add(new MovingPlatform(200,height(200),platform,150,25,10,true,200,600));
         }else if(level == 3){
             startPos[0] = 0;
             startPos[1] = height(25);
 
             try {
                 background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Test Floor.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -67,7 +70,7 @@ public class Level {
 
             try {
                 background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Test Floor.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -79,7 +82,7 @@ public class Level {
 
             try {
                 background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
-                platform = ImageIO.read(new File("src/Backgrounds/Floor1.png"));
+                platform = ImageIO.read(new File("src/Backgrounds/Test Floor.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -114,4 +117,13 @@ public class Level {
     private int height(int heightFromBottom){
         return Frame.getHeight()-heightFromBottom;
     }
+
+    public void updatePlatforms(int tick){
+        for(Platform a:platforms){
+            if(a.getClass() == MovingPlatform.class){
+                ((MovingPlatform) a).updatePlatform(tick);
+            }
+        }
+    }
+
 }

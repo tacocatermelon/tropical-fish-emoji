@@ -31,8 +31,8 @@ public class Player {
     private GraphicsPanel graphicsPanel;
 
     public Player() {
-        xPos = 0;
-        yPos = 0;
+        xPos = 225;
+        yPos = Frame.getHeight()-250;
         xVel = 0;
         yVel = 0;
         facingRight = true;
@@ -148,7 +148,7 @@ public class Player {
     }
 
     public void moveUp() {
-        yVel += 0.3;
+        yVel += 0.2;
     }
 
     public void updateGravity() {
@@ -224,7 +224,9 @@ public class Player {
 
         for(Platform pl: platforms){
             Rectangle b = pl.platformRect();
-            out = (a.getY() + a.getHeight() == b.getY() || a.getY() == b.getY() + b.getHeight()) && ((a.getX() >= b.getX()) || (a.getX() + a.getWidth() <= b.getX() + b.getWidth()));
+            if(a.getY() + a.getHeight() == b.getY() || a.getY() == b.getY() + b.getHeight()) {
+                out = isAbove(pl);
+            }
             if(out){
                 return out;
             }
@@ -250,12 +252,12 @@ public class Player {
 
     public void horizCollis(Platform p){
         if(isNextTo(p)) {
-            if (prevX < xPos) {//moving right
+            if (prevX < xPos||(p.getClass()==MovingPlatform.class)&&!((MovingPlatform) p).isGoingRight()) { //moving right or platform moving left
                 if (xPos + animation.getSprite().getWidth() > p.getxPos() && xPos + animation.getSprite().getWidth() < p.getxPos()+p.getWidth()) {
                     xVel = 0;
                     xPos = p.getxPos() - animation.getSprite().getWidth();
                 }
-            } else if (prevX > xPos) {//moving left
+            } else if (prevX > xPos||(p.getClass()==MovingPlatform.class)&&((MovingPlatform) p).isGoingRight()) { //moving left or platform moving right
                 if (xPos < p.getxPos() + p.getWidth() && xPos > p.getxPos()) {
                     xVel = 0;
                     xPos = p.getxPos() + p.getWidth();

@@ -19,6 +19,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
     private double[] pressLength;
     private Level[] levels;
     private ArrayList<Platform> platforms;
+    private int tick;
 
     public GraphicsPanel(){
         currentLevel = 1;
@@ -40,6 +41,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
 
         player.setGraphicsPanel(this);
 
+        tick = 0;
         timer = new Timer(2, this);
     }
 
@@ -51,7 +53,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
 
         if (currentLevel == 1) {
             floor.setxPos(0);
-            floor.setyPos(Frame.getHeight() - floor.getPlatformImage().getHeight());
+            floor.setyPos(Frame.getHeight() - floor.getPlatformImage().getHeight()/2);
             floor.drawPlatform(g);
         } else {
             floor.setxPos(-100000000);
@@ -76,6 +78,8 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        tick++;
+
         if(player.getyPos()-player.getAnimation().getSprite().getHeight()>Frame.getHeight() && currentLevel>1){
             currentLevel--;
             player.setyPos(0);
@@ -85,6 +89,7 @@ public class GraphicsPanel extends JPanel implements ActionListener, KeyListener
             player.setyPos(levels[currentLevel-1].getStartPos()[1]);
         }
 
+        levels[currentLevel-1].updatePlatforms(tick);
         platforms = levels[currentLevel-1].getPlatforms();
 
         if(!flyMode) {
