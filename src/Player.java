@@ -236,12 +236,12 @@ public class Player {
 
     public void vertcollis(Platform p){
         if(isAbove(p)) {
-            if (prevY < yPos) {//moving down
+            if (prevY < yPos || (p.getClass() == VerticalPlatform.class) && ((VerticalPlatform) p).isGoingUp()) { //moving down or platform moving up
                 if (yPos + animation.getSprite().getHeight() > p.getyPos() && yPos + animation.getSprite().getHeight() < p.getyPos()+p.getHeight()) {
                     yVel = 0;
                     yPos = p.getyPos() - animation.getSprite().getHeight();
                 }
-            } else if (prevY > yPos) {//moving up
+            } else if (prevY > yPos || (p.getClass() == VerticalPlatform.class) && !((VerticalPlatform) p).isGoingUp()) { //moving up or platform moving down
                 if (yPos < p.getyPos() + p.getHeight() && yPos > p.getyPos()) {
                     yVel = 0;
                     yPos = p.getyPos() + p.getHeight()+1;
@@ -252,12 +252,15 @@ public class Player {
 
     public void horizCollis(Platform p){
         if(isNextTo(p)) {
-            if (prevX < xPos||(p.getClass()==MovingPlatform.class)&&!((MovingPlatform) p).isGoingRight()) { //moving right or platform moving left
+            if((prevX > p.getxPos() || prevX+animation.getSprite().getWidth() < p.getxPos()+p.getWidth()) && (p.getClass() == VerticalPlatform.class) && ((VerticalPlatform) p).isGoingUp()){
+                return;
+            }
+            if (prevX < xPos || (p.getClass() == HorizontalPlatform.class) && !((HorizontalPlatform) p).isGoingRight()) { //moving right or platform moving left
                 if (xPos + animation.getSprite().getWidth() > p.getxPos() && xPos + animation.getSprite().getWidth() < p.getxPos()+p.getWidth()) {
                     xVel = 0;
                     xPos = p.getxPos() - animation.getSprite().getWidth();
                 }
-            } else if (prevX > xPos||(p.getClass()==MovingPlatform.class)&&((MovingPlatform) p).isGoingRight()) { //moving left or platform moving right
+            } else if (prevX > xPos || (p.getClass() == HorizontalPlatform.class) && ((HorizontalPlatform) p).isGoingRight()) { //moving left or platform moving right
                 if (xPos < p.getxPos() + p.getWidth() && xPos > p.getxPos()) {
                     xVel = 0;
                     xPos = p.getxPos() + p.getWidth();

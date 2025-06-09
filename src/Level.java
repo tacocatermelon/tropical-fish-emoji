@@ -44,14 +44,17 @@ public class Level {
             startPos[1] = height(200);
 
             try {
-                background = ImageIO.read(new File("src/Backgrounds/sky background.png"));
+                background = ImageIO.read(new File("src/Backgrounds/level 2 background.png"));
                 platform = ImageIO.read(new File("src/Backgrounds/Test Floor.png"));
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
 
             platforms.add(new Platform(100, height(150), platform, 200, 30));
-            platforms.add(new MovingPlatform(200,height(200),platform,150,25,10,true,200,600));
+            platforms.add(new HorizontalPlatform(200,height(200),platform,150,25,10,true,200,600));
+            platforms.add(new Platform(800, height(300), platform, 200, 30));
+            platforms.add(new Platform(700, height(400), platform, 125, 15));
+            platforms.add(new VerticalPlatform(400, height(500), platform, 165, 25, 15, true, height(800), height(450)));
         }else if(level == 3){
             startPos[0] = 0;
             startPos[1] = height(25);
@@ -120,8 +123,11 @@ public class Level {
 
     public void updatePlatforms(int tick){
         for(Platform a:platforms){
-            if(a.getClass() == MovingPlatform.class){
-                ((MovingPlatform) a).updatePlatform(tick);
+            if(a.getClass() == HorizontalPlatform.class){
+                ((HorizontalPlatform) a).updatePlatform(tick);
+            }
+            if(a.getClass() == VerticalPlatform.class){
+                ((VerticalPlatform) a).updatePlatform(tick);
             }
         }
     }
